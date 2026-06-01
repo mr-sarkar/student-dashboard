@@ -4,26 +4,23 @@ import HeroTile from './components/HeroTile';
 import CourseCard from './components/CourseCard';
 import ActivityTile from './components/ActivityTile';
 
-async function getCourses(): Promise<Course[]> {
-  try {
-    const { data, error } = await supabase
-      .from('courses')
-      .select('*');
+// This function runs on the server
+async function getCoursesFromDB(): Promise<Course[]> {
+  const { data, error } = await supabase
+    .from('courses')
+    .select('*');
 
-    if (error) {
-      console.log('Error:', error.message);
-      return [];
-    }
-
-    return data || [];
-  } catch (err) {
-    console.log('Error fetching courses:', err);
+  if (error) {
+    console.error('Supabase error:', error.message);
     return [];
   }
+
+  return data || [];
 }
 
+// This is the main page component
 export default async function Dashboard() {
-  const courses = await getCourses();
+  const courses = await getCoursesFromDB();
 
   return (
     <div className="flex h-screen bg-black overflow-hidden">
@@ -34,7 +31,7 @@ export default async function Dashboard() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <HeroTile />
             
-            {courses.length > 0 ? (
+            {courses && courses.length > 0 ? (
               courses.map((course) => (
                 <CourseCard
                   key={course.id}
