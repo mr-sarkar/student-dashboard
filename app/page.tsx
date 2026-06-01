@@ -5,17 +5,21 @@ import CourseCard from './components/CourseCard';
 import ActivityTile from './components/ActivityTile';
 
 async function getCourses(): Promise<Course[]> {
-  const { data, error } = await supabase
-    .from('courses')
-    .select('*');
+  try {
+    const { data, error } = await supabase
+      .from('courses')
+      .select('*');
 
-  if (error) {
-    console.log('Error:', error.message);
+    if (error) {
+      console.log('Error:', error.message);
+      return [];
+    }
+
+    return data || [];
+  } catch (err) {
+    console.log('Error fetching courses:', err);
     return [];
   }
-
-  console.log('Courses found:', data?.length || 0);
-  return data || [];
 }
 
 export default async function Dashboard() {
